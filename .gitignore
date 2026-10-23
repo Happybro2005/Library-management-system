@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Database files & local postgres data
+.pgdata/
+**/.pgdata/
+server/data/
+*.enc.json
+*.enc
+
+# Production builds
+dist/
+**/dist/
+build/
+**/build/
+
+# Environment files
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# Media & Uploads
+uploads/
+**/uploads/
+
+# Logs & temp files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

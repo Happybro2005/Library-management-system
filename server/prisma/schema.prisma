@@ -1,0 +1,260 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+}
+
+enum BookType {
+  PHYSICAL
+  EBOOK
+  HYBRID
+}
+
+enum CopyStatus {
+  AVAILABLE
+  BORROWED
+  MAINTENANCE
+  LOST
+  DAMAGED
+}
+
+enum CopyCondition {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+}
+
+enum IssueStatus {
+  ISSUED
+  RETURNED
+}
+
+enum SeatStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+}
+
+enum SeatAssignmentStatus {
+  ACTIVE
+  RELEASED
+}
+
+enum SeatRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model Admin {
+  id                   String              @id @default(uuid())
+  email                String              @unique
+  username             String              @unique
+  passwordHash         String
+  fullName             String
+  role                 Role                @default(ADMIN)
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  issuedBooks          BookIssue[]
+  seatAssignments      SeatAssignment[]
+  activityLogs         ActivityLog[]
+  reviewedSeatRequests SeatChangeRequest[]
+
+  @@map("admins")
+}
+
+model User {
+  id                 String              @id @default(uuid())
+  membershipNo       String              @unique
+  fullName           String
+  email              String              @unique
+  passwordHash       String?
+  phone              String?
+  address            String?
+  status             UserStatus          @default(ACTIVE)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  bookIssues         BookIssue[]
+  seatAssignments    SeatAssignment[]
+  seatChangeRequests SeatChangeRequest[]
+
+  @@index([status])
+  @@index([fullName])
+  @@map("users")
+}
+
+model Book {
+  id              String            @id @default(uuid())
+  title           String
+  author          String
+  isbn            String            @unique
+  publisher       String?
+  category        String
+  description     String?
+  publicationYear Int?
+  language        String            @default("English")
+  coverImageUrl   String?
+  bookType        BookType          @default(PHYSICAL)
+  ebookFileUrl    String?
+  ebookFileName   String?
+  ebookFileSize   Int?
+  ebookMimeType   String?
+  isArchived      Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  copies          BookCopy[]
+
+  @@index([title])
+  @@index([author])
+  @@index([category])
+  @@index([bookType])
+  @@index([isArchived])
+  @@map("books")
+}
+
+model BookCopy {
+  id            String         @id @default(uuid())
+  bookId        String
+  book          Book           @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  barcode       String         @unique
+  accessionNo   String         @unique
+  condition     CopyCondition  @default(GOOD)
+  shelfLocation String
+  status        CopyStatus     @default(AVAILABLE)
+  isArchived    Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  issues        BookIssue[]
+
+  @@index([bookId])
+  @@index([status])
+  @@index([isArchived])
+  @@map("book_copies")
+}
+
+model BookIssue {
+  id              String       @id @default(uuid())
+  copyId          String
+  copy            BookCopy     @relation(fields: [copyId], references: [id], onDelete: Restrict)
+  userId          String
+  user            User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+  issuedByAdminId String
+  issuedByAdmin   Admin        @relation(fields: [issuedByAdminId], references: [id], onDelete: Restrict)
+  issueDate       DateTime     @default(now())
+  returnDate      DateTime?
+  status          IssueStatus  @default(ISSUED)
+  notes           String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([copyId, status])
+  @@index([userId, status])
+  @@index([status])
+  @@map("book_issues")
+}
+
+model Seat {
+  id                    String              @id @default(uuid())
+  seatNumber            Int                 @unique
+  label                 String
+  section               String              @default("Main Hall")
+  status                SeatStatus          @default(AVAILABLE)
+  isArchived            Boolean             @default(false)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  assignments           SeatAssignment[]
+  currentSeatRequests   SeatChangeRequest[] @relation("CurrentSeatRequests")
+  requestedSeatRequests SeatChangeRequest[] @relation("RequestedSeatRequests")
+
+  @@index([status])
+  @@index([isArchived])
+  @@map("seats")
+}
+
+model SeatAssignment {
+  id                String               @id @default(uuid())
+  seatId            String
+  seat              Seat                 @relation(fields: [seatId], references: [id], onDelete: Restrict)
+  userId            String
+  user              User                 @relation(fields: [userId], references: [id], onDelete: Restrict)
+  assignedByAdminId String
+  assignedByAdmin   Admin                @relation(fields: [assignedByAdminId], references: [id], onDelete: Restrict)
+  startTime         DateTime             @default(now())
+  endTime           DateTime?
+  status            SeatAssignmentStatus @default(ACTIVE)
+  notes             String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  @@index([seatId, status])
+  @@index([userId, status])
+  @@map("seat_assignments")
+}
+
+model SeatChangeRequest {
+  id                String            @id @default(uuid())
+  userId            String
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentSeatId     String
+  currentSeat       Seat              @relation("CurrentSeatRequests", fields: [currentSeatId], references: [id], onDelete: Restrict)
+  requestedSeatId   String
+  requestedSeat     Seat              @relation("RequestedSeatRequests", fields: [requestedSeatId], references: [id], onDelete: Restrict)
+  reason            String?
+  status            SeatRequestStatus @default(PENDING)
+  adminNotes        String?
+  reviewedByAdminId String?
+  reviewedByAdmin   Admin?            @relation(fields: [reviewedByAdminId], references: [id], onDelete: SetNull)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([userId, status])
+  @@index([status])
+  @@map("seat_change_requests")
+}
+
+model ActivityLog {
+  id         String   @id @default(uuid())
+  actorId    String
+  actor      Admin    @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  actorName  String
+  actionType String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  timestamp  DateTime @default(now())
+
+  @@index([actionType])
+  @@index([entityType])
+  @@index([timestamp])
+  @@map("activity_logs")
+}
+
+model LibrarySettings {
+  id                  String   @id @default("default-settings")
+  libraryName         String   @default("City Central Library")
+  email               String   @default("contact@citylibrary.org")
+  phone               String   @default("+1 (555) 019-2834")
+  address             String   @default("100 Library Square, Suite 400")
+  logoUrl             String?
+  defaultLanguage     String   @default("en")
+  defaultSeatCapacity Int      @default(30)
+  updatedAt           DateTime @updatedAt
+
+  @@map("library_settings")
+}
