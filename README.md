@@ -1,6 +1,24 @@
 # Library Management System (LMS) - Enterprise Administration
 
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live%20App-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://library-management-system-five-mocha.vercel.app)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Happybro2005/Library-management-system)
+[![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-6.4-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+
 An enterprise-grade Library Management System designed for modern institutions, built with **React 18, TypeScript, Vite, Express.js, PostgreSQL, and Prisma ORM**.
+
+---
+
+## 🌐 Live Deployments & Repository Links
+
+| Target | URL | Status | Description |
+|---|---|---|---|
+| **Production Web App** | [https://library-management-system-five-mocha.vercel.app](https://library-management-system-five-mocha.vercel.app) | 🟢 Live | Main production frontend deployed on Vercel |
+| **Vercel Direct URL** | [https://library-management-system-hm5zghkvc-2k24csai1c2413259-3385.vercel.app](https://library-management-system-hm5zghkvc-2k24csai1c2413259-3385.vercel.app) | 🟢 Active | Direct immutable deployment preview URL |
+| **Vercel Dashboard** | [Vercel Project Dashboard](https://vercel.com/2k24csai1c2413259-3385/library-management-system) | 🟢 Managed | Project settings, builds, and domains |
+| **GitHub Source Code** | [https://github.com/Happybro2005/Library-management-system](https://github.com/Happybro2005/Library-management-system) | 🟢 Main | Official GitHub repository |
 
 ---
 
@@ -170,3 +188,10 @@ When deploying on managed cloud providers (e.g., Railway, Render, Fly.io, AWS EC
 - **Set Environment Variable**: Configure `DB_ENCRYPTION_KEY` in your production secret manager.
 - **SSL Configuration**: For managed PostgreSQL services (AWS RDS, GCP Cloud SQL, Supabase, Neon), set **SSL Mode** to `Required` or `Verify-CA`.
 - **Outbound Firewall**: Ensure your cloud host has outbound access to the target PostgreSQL port (typically `5432`).
+
+### 🔺 Vercel Deployment (Frontend)
+The frontend client is deployed on Vercel:
+- **Build Command**: `npm run build --prefix client`
+- **Output Directory**: `client/dist`
+- **Configuration**: Managed automatically via [`vercel.json`](file:///d:/management%20system/vercel.json)
+- **API Target**: Configurable via `VITE_API_URL` environment variable in Vercel project settings to connect with your deployed backend server.

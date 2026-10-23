@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "Enterprise Library Management System (LMS)",
   "private": true,
+  "homepage": "https://library-management-system-five-mocha.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Happybro2005/Library-management-system.git"
+  },
   "scripts": {
     "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
     "dev:server": "npm run dev --prefix server",

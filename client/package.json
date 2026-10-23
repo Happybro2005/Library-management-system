@@ -2,6 +2,11 @@
   "name": "lms-client",
   "private": true,
   "version": "1.0.0",
+  "homepage": "https://library-management-system-five-mocha.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Happybro2005/Library-management-system.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
